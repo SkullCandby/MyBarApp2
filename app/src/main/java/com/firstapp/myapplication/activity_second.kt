@@ -80,7 +80,7 @@ class activity_second : AppCompatActivity() {
             System.out.println(elem)
         }
         val database = FirebaseDatabase.getInstance().reference
-        database.child(user_id).setValue(Rec(txt, formatted, usr!!.email.toString()))
+        database.child(user_id).setValue(Rec(txt, formatted, usr!!.email.toString(), coord_x, coord_y))
     }
     fun redirect_login(view: View) {
         val acvt = Intent(this, Login::class.java)
