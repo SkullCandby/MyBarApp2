@@ -9,7 +9,7 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RequiresApi
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_second.*
 import kotlin.math.floor
 
@@ -25,6 +25,7 @@ class activity_second : AppCompatActivity() {
     var coord_x = 0
     var coord_y = 0
     var usr = Login().user
+    val reference = FirebaseDatabase.getInstance().getReference("Xzen61WXylX6VRKSkdNkgr9OAXx2") // Заменить этот ключ на универсальный для каждого пользователя
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)
@@ -38,12 +39,10 @@ class activity_second : AppCompatActivity() {
                         //if (x in 199.0..1000.0 && y >= 153 && y <= 889){
                             pos_x = x.toInt()
                             pos_y = y.toInt()
-                            my_print_ln(pos_x - 538, pos_y + 4 - 538)
                             coord_x = ((pos_x - 538) / 50.0).toInt()
                             coord_y = ((pos_y + 4 - 538) / 40.0).toInt() * -1
                             coord_y.toInt()
                             //my_print_ln(pos_x, pos_y)
-                            my_print_ln(coord_x, coord_y)
                         //}
                     }
                 }
@@ -73,19 +72,51 @@ class activity_second : AppCompatActivity() {
 
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
         val formatted = current.format(formatter)
-        println(formatted)
 
         arr += txt
-        for (elem in arr){
-            System.out.println(elem)
-        }
         val database = FirebaseDatabase.getInstance().reference
-        database.child(user_id).setValue(Rec(txt, formatted, usr!!.email.toString(), coord_x, coord_y))
+        val data = Rec(txt, formatted, usr!!.email.toString())
+        val newData = database.child(user_id).push()
+        newData.setValue(data)
+        getData()
+
     }
     fun redirect_login(view: View) {
         val acvt = Intent(this, Login::class.java)
 
         startActivity(acvt)
+
+    }
+
+    fun getData(){
+        reference.addValueEventListener(object : ValueEventListener
+        {
+            override fun onCancelled(p0: DatabaseError) {
+                println("Cancel")
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                val list = ArrayList<Rec>()
+                for (data in p0.children)
+                {
+                    try {
+                        val model = data.getValue(Rec::class.java)
+                        list.add(model as Rec)
+                    }
+                    catch (e : DatabaseException){
+                        println(data.getValue(Rec::class.java))
+                        println("ТУТ")
+                    }
+                }
+
+                if (list.size > 0) {
+                    for ((index, value) in list.withIndex()) {
+                        println("the element at $index is ${value.user_text}")
+                    }
+                }
+            }
+        }
+        )
 
     }
 
@@ -97,4 +128,4 @@ class activity_second : AppCompatActivity() {
 // Твой репозиторий
 //  |
 // \_/
-// Что такое статистика настроения?
+// Что такое статистика настроения?+
