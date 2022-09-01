@@ -1,2 +1,2 @@
-# MyBarApp
-Приложение: трекинг настроение для людей с БАР
+# MyBarApp 
+Not finished app with mood tracking for people with bipolar affective disorder
